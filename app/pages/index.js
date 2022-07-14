@@ -1,62 +1,60 @@
-import { Image } from "blitz"
-import logo from "public/logo.png"
-/*
- * This file is just for a pleasant getting started page for your new app.
- * You can delete everything in here and start from scratch if you like.
- */
+import { Cloudinary } from "@cloudinary/url-gen"
+import Overlay from "components/Overlay"
+import { useState } from "react"
+import ReactPlayer from "react-player"
 
 const Home = () => {
+  const [playVideo, setPlayVideo] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [overlay, setOverlay] = useState(false)
+  const [vidControl, setVidControl] = useState(false)
+
+  const cld = new Cloudinary({
+    cloud: {
+      cloudName: "kizmelvin",
+    },
+  })
+  const myVideo = cld.video("gvf9uuemq7mfa6kevvfp.mov").toURL()
+
+  const mouseEnter = () => {
+    setOverlay(true)
+    setPlayVideo(true)
+    if (isPlaying) {
+      setOverlay(false)
+      setVidControl(true)
+    }
+  }
+
+  const mouseLeave = () => {
+    setOverlay(false)
+    if (!isPlaying) {
+      setPlayVideo(false)
+    }
+  }
+  const videoEnded = () => {
+    setVidControl(false)
+    setPlayVideo(false)
+    setIsPlaying(false)
+  }
+
   return (
     <div className="container">
+      <h1>
+        <strong>Netflix-style Video Overlays in Blitz.js</strong>
+      </h1>
+      <h5>Hover to play the video and see the overlays</h5>
       <main>
-        <div className="logo">
-          <Image src={logo} alt="blitzjs" />
-        </div>
-        <p>
-          <strong>Congrats!</strong> Your app is ready.
-        </p>
-        <div
-          className="buttons"
-          style={{
-            marginTop: "5rem",
-          }}
-        >
-          <a
-            className="button"
-            href="https://blitzjs.com/docs/getting-started?utm_source=blitz-new&utm_medium=app-template&utm_campaign=blitz-new"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-          <a
-            className="button-outline"
-            href="https://github.com/blitz-js/blitz"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Github Repo
-          </a>
-          <a
-            className="button-outline"
-            href="https://discord.blitzjs.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Discord Community
-          </a>
+        <div className="wrapper" onMouseEnter={mouseEnter} onMouseLeave={mouseLeave}>
+          <ReactPlayer
+            onEnded={videoEnded}
+            controls={vidControl}
+            width={"600px"}
+            playing={playVideo}
+            url={myVideo}
+          />{" "}
+          {overlay && <Overlay setPlayVideo={setPlayVideo} setIsPlaying={setIsPlaying} />}
         </div>
       </main>
-
-      <footer>
-        <a
-          href="https://blitzjs.com?utm_source=blitz-new&utm_medium=app-template&utm_campaign=blitz-new"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by Blitz.js
-        </a>
-      </footer>
 
       <style jsx global>{`
         @import url("https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@300;700&display=swap");
@@ -75,112 +73,76 @@ const Home = () => {
           box-sizing: border-box;
         }
         .container {
-          min-height: 100vh;
+          // min-height: 100vh;
           display: flex;
           flex-direction: column;
           justify-content: center;
           align-items: center;
         }
-
         main {
-          padding: 5rem 0;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
+          padding: 0;
+          width: 600px;
+          position: relative;
+          background: grey;
+        }
+        .wrapper {
+          cursor: pointer;
         }
 
-        main p {
-          font-size: 1.2rem;
-        }
-
-        p {
-          text-align: center;
-        }
-
-        footer {
+        .overlay-main {
+          height: auto;
           width: 100%;
-          height: 60px;
-          border-top: 1px solid #eaeaea;
+          background-color: rgb(10, 12, 10);
+          text-align: center;
+          position: absolute;
+          bottom: 5;
+          padding: 1rem;
+        }
+
+        .controls {
           display: flex;
-          justify-content: center;
+          justify-content: space-between;
           align-items: center;
-          background-color: #45009d;
         }
 
-        footer a {
+        .controls button {
+          padding: 0.3rem;
+          margin-left: 1rem;
+          cursor: pointer;
+          font-size: 1.6rem;
+          border-radius: 50%;
+          background: rgb(0, 14, 19);
+          color: white;
+          border: 0.5px solid white;
+        }
+        .descriptions {
+          padding: 0.1rem;
           display: flex;
-          justify-content: center;
+          justify-content: space-around;
           align-items: center;
         }
-
-        footer a {
-          color: #f4f4f4;
-          text-decoration: none;
-        }
-
-        .logo {
-          margin-bottom: 2rem;
-        }
-
-        .logo img {
-          width: 300px;
-        }
-
-        .buttons {
-          display: grid;
-          grid-auto-flow: column;
-          grid-gap: 0.5rem;
-        }
-        .button {
+        .descriptions button {
           font-size: 1rem;
-          background-color: #6700eb;
-          padding: 1rem 2rem;
-          color: #f4f4f4;
-          text-align: center;
+          background: rgb(0, 14, 19);
+          color: white;
         }
-
-        .button.small {
-          padding: 0.5rem 1rem;
+        .descriptions h3 {
+          color: rgb(54, 179, 4);
         }
-
-        .button:hover {
-          background-color: #45009d;
+        .descriptions h4 {
+          color: white;
         }
-
-        .button-outline {
-          border: 2px solid #6700eb;
-          padding: 1rem 2rem;
-          color: #6700eb;
-          text-align: center;
-        }
-
-        .button-outline:hover {
-          border-color: #45009d;
-          color: #45009d;
-        }
-
-        pre {
-          background: #fafafa;
-          border-radius: 5px;
-          padding: 0.75rem;
-          text-align: center;
-        }
-        code {
-          font-size: 0.9rem;
-          font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono,
-            Bitstream Vera Sans Mono, Courier New, monospace;
-        }
-
-        .grid {
+        .tags ul {
+          padding: 0;
           display: flex;
+          justify-content: space-around;
           align-items: center;
-          justify-content: center;
-          flex-wrap: wrap;
-
-          max-width: 800px;
-          margin-top: 3rem;
+        }
+        li {
+          padding: 0;
+          font-size: 1.2rem;
+          // background: rgb(0, 14, 19);
+          color: white;
         }
 
         @media (max-width: 600px) {
